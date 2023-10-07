@@ -19,28 +19,35 @@ type Greeter struct {
 	Hello string
 }
 
-// GreeterRepo is a Greater repo.
-type GreeterRepo interface {
-	Save(context.Context, *Greeter) (*Greeter, error)
-	Update(context.Context, *Greeter) (*Greeter, error)
-	FindByID(context.Context, int64) (*Greeter, error)
-	ListByHello(context.Context, string) ([]*Greeter, error)
-	ListAll(context.Context) ([]*Greeter, error)
+type Product struct {
+	Id          string `db:"id"`
+	Name        string `db:"name"`
+	Description string `db:"description"`
+	Price       int64  `db:"price"`
 }
 
-// GreeterUsecase is a Greeter usecase.
-type GreeterUsecase struct {
-	repo GreeterRepo
+// GreeterRepo is a Greater repo.
+type ProductRepo interface {
+	Save(context.Context, *Product) (*Product, error)
+	Update(context.Context, *Product) (*Product, error)
+	FindByID(context.Context, int64) (*Product, error)
+	ListByHello(context.Context, string) ([]*Product, error)
+	ListAll(context.Context) ([]*Product, error)
+}
+
+// ProductUsecase is a Greeter usecase.
+type ProductUsecase struct {
+	repo ProductRepo
 	log  *log.Helper
 }
 
 // NewGreeterUsecase new a Greeter usecase.
-func NewGreeterUsecase(repo GreeterRepo, logger log.Logger) *GreeterUsecase {
-	return &GreeterUsecase{repo: repo, log: log.NewHelper(logger)}
+func NewProductUsecase(repo ProductRepo, logger log.Logger) *ProductUsecase {
+	return &ProductUsecase{repo: repo, log: log.NewHelper(logger)}
 }
 
 // CreateGreeter creates a Greeter, and returns the new Greeter.
-func (uc *GreeterUsecase) CreateGreeter(ctx context.Context, g *Greeter) (*Greeter, error) {
-	uc.log.WithContext(ctx).Infof("CreateGreeter: %v", g.Hello)
+func (uc *ProductUsecase) CreateProduct(ctx context.Context, g *Product) (*Product, error) {
+	// uc.log.WithContext(ctx).Infof("CreateGreeter: %v", g.Hello)
 	return uc.repo.Save(ctx, g)
 }

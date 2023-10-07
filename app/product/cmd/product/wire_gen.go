@@ -7,14 +7,17 @@
 package main
 
 import (
+	"github.com/go-kratos/kratos/v2"
+	"github.com/go-kratos/kratos/v2/log"
 	"github.com/thetnaingtn/go-boutique/app/product/internal/biz"
 	"github.com/thetnaingtn/go-boutique/app/product/internal/conf"
 	"github.com/thetnaingtn/go-boutique/app/product/internal/data"
 	"github.com/thetnaingtn/go-boutique/app/product/internal/server"
 	"github.com/thetnaingtn/go-boutique/app/product/internal/service"
+)
 
-	"github.com/go-kratos/kratos/v2"
-	"github.com/go-kratos/kratos/v2/log"
+import (
+	_ "go.uber.org/automaxprocs"
 )
 
 // Injectors from wire.go:
@@ -25,11 +28,11 @@ func wireApp(confServer *conf.Server, confData *conf.Data, logger log.Logger) (*
 	if err != nil {
 		return nil, nil, err
 	}
-	greeterRepo := data.NewGreeterRepo(dataData, logger)
-	greeterUsecase := biz.NewGreeterUsecase(greeterRepo, logger)
-	greeterService := service.NewGreeterService(greeterUsecase)
-	grpcServer := server.NewGRPCServer(confServer, greeterService, logger)
-	httpServer := server.NewHTTPServer(confServer, greeterService, logger)
+	productRepo := data.NewProductRepo(dataData, logger)
+	productUsecase := biz.NewProductUsecase(productRepo, logger)
+	productService := service.NewProductService(productUsecase)
+	grpcServer := server.NewGRPCServer(confServer, productService, logger)
+	httpServer := server.NewHTTPServer(confServer, productService, logger)
 	app := newApp(logger, grpcServer, httpServer)
 	return app, func() {
 		cleanup()
