@@ -52,9 +52,44 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Status'
+    /products/{id}:
+        get:
+            tags:
+                - Product
+            operationId: Product_GetProduct
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetProductReply'
+                default:
+                    description: Default error response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Status'
 components:
     schemas:
         CreateProductReply:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                price:
+                    type: string
+        GetProductReply:
             type: object
             properties:
                 id:

@@ -44,7 +44,20 @@ func (s *ProductService) DeleteProduct(ctx context.Context, req *pb.DeleteProduc
 	return &pb.DeleteProductReply{}, nil
 }
 func (s *ProductService) GetProduct(ctx context.Context, req *pb.GetProductRequest) (*pb.GetProductReply, error) {
-	return &pb.GetProductReply{}, nil
+	p, err := s.uc.GetProduct(ctx, req.GetId())
+
+	if err != nil {
+		return &pb.GetProductReply{}, err
+	}
+
+	product := &pb.GetProductReply{
+		Id:          p.Id,
+		Name:        p.Name,
+		Description: p.Description,
+		Price:       p.Price,
+	}
+
+	return product, nil
 }
 func (s *ProductService) ListProduct(ctx context.Context, req *pb.ListProductRequest) (*pb.ListProductReply, error) {
 	return &pb.ListProductReply{}, nil
