@@ -43,3 +43,7 @@ func (uc *ProductUsecase) CreateProduct(ctx context.Context, g *Product) (*Produ
 func (uc *ProductUsecase) GetProduct(ctx context.Context, id string) (*Product, error) {
 	return uc.repo.FindByID(ctx, id)
 }
+
+func (uc *ProductUsecase) Update(ctx context.Context, id string, p *UpdateProduct) (*Product, error) {
+	return uc.repo.Update(ctx, id, p)
+}

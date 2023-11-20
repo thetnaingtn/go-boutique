@@ -24,3 +24,5 @@ all:
 build:
 	find app -type d -depth 1 -print | xargs -L 1 bash -c 'cd "$$0" && pwd && $(MAKE) build'
 
+generate-product-stub:
+	kratos proto client api/product/v1/product.proto

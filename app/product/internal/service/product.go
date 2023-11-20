@@ -38,7 +38,27 @@ func (s *ProductService) CreateProduct(ctx context.Context, req *pb.CreateProduc
 	return reply, nil
 }
 func (s *ProductService) UpdateProduct(ctx context.Context, req *pb.UpdateProductRequest) (*pb.UpdateProductReply, error) {
-	return &pb.UpdateProductReply{}, nil
+
+	up := &biz.UpdateProduct{
+		Name:        req.Body.Name,
+		Price:       req.Body.Price,
+		Description: req.Body.Description,
+	}
+
+	p, err := s.uc.Update(ctx, req.GetId(), up)
+
+	if err != nil {
+		return &pb.UpdateProductReply{}, err
+	}
+
+	updatedProduct := &pb.UpdateProductReply{
+		Id:          req.Id,
+		Name:        p.Name,
+		Description: p.Description,
+		Price:       p.Price,
+	}
+
+	return updatedProduct, nil
 }
 func (s *ProductService) DeleteProduct(ctx context.Context, req *pb.DeleteProductRequest) (*pb.DeleteProductReply, error) {
 	return &pb.DeleteProductReply{}, nil

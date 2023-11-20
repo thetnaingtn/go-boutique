@@ -68,7 +68,7 @@ func (r *productRepo) Update(ctx context.Context, id string, p *biz.UpdateProduc
 		product.Price = *p.Price
 	}
 
-	q := `UPDATE SET products "name" = :name, "description" = :description, "price" = :price WHERE "id" = :id`
+	q := `UPDATE products SET "name" = :name, "description" = :description, "price" = :price WHERE "id" = :id`
 
 	_, err = r.data.db.NamedExecContext(ctx, q, product)
 

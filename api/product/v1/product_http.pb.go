@@ -22,16 +22,19 @@ const _ = http.SupportPackageIsVersion1
 const OperationProductCreateProduct = "/api.product.v1.Product/CreateProduct"
 const OperationProductGetProduct = "/api.product.v1.Product/GetProduct"
 const OperationProductListProduct = "/api.product.v1.Product/ListProduct"
+const OperationProductUpdateProduct = "/api.product.v1.Product/UpdateProduct"
 
 type ProductHTTPServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductReply, error)
 	GetProduct(context.Context, *GetProductRequest) (*GetProductReply, error)
 	ListProduct(context.Context, *ListProductRequest) (*ListProductReply, error)
+	UpdateProduct(context.Context, *UpdateProductRequest) (*UpdateProductReply, error)
 }
 
 func RegisterProductHTTPServer(s *http.Server, srv ProductHTTPServer) {
 	r := s.Route("/")
 	r.POST("/products", _Product_CreateProduct0_HTTP_Handler(srv))
+	r.PUT("/products/{id}", _Product_UpdateProduct0_HTTP_Handler(srv))
 	r.GET("/products/{id}", _Product_GetProduct0_HTTP_Handler(srv))
 	r.GET("/products", _Product_ListProduct0_HTTP_Handler(srv))
 }
@@ -54,6 +57,31 @@ func _Product_CreateProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.C
 			return err
 		}
 		reply := out.(*CreateProductReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _Product_UpdateProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateProductRequest
+		if err := ctx.Bind(&in.Body); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProductUpdateProduct)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateProduct(ctx, req.(*UpdateProductRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateProductReply)
 		return ctx.Result(200, reply)
 	}
 }
@@ -103,6 +131,7 @@ type ProductHTTPClient interface {
 	CreateProduct(ctx context.Context, req *CreateProductRequest, opts ...http.CallOption) (rsp *CreateProductReply, err error)
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *GetProductReply, err error)
 	ListProduct(ctx context.Context, req *ListProductRequest, opts ...http.CallOption) (rsp *ListProductReply, err error)
+	UpdateProduct(ctx context.Context, req *UpdateProductRequest, opts ...http.CallOption) (rsp *UpdateProductReply, err error)
 }
 
 type ProductHTTPClientImpl struct {
@@ -146,6 +175,19 @@ func (c *ProductHTTPClientImpl) ListProduct(ctx context.Context, in *ListProduct
 	opts = append(opts, http.Operation(OperationProductListProduct))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ProductHTTPClientImpl) UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...http.CallOption) (*UpdateProductReply, error) {
+	var out UpdateProductReply
+	pattern := "/products/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProductUpdateProduct))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in.Body, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
