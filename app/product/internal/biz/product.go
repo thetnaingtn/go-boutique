@@ -23,6 +23,7 @@ type ProductRepo interface {
 	Save(context.Context, *Product) (*Product, error)
 	Update(context.Context, string, *UpdateProduct) (*Product, error)
 	FindByID(context.Context, string) (*Product, error)
+	DeleteById(context.Context, string) (string, error)
 	ListByHello(context.Context, string) ([]*Product, error)
 	ListAll(context.Context) ([]*Product, error)
 }
@@ -46,4 +47,8 @@ func (uc *ProductUsecase) GetProduct(ctx context.Context, id string) (*Product, 
 
 func (uc *ProductUsecase) Update(ctx context.Context, id string, p *UpdateProduct) (*Product, error) {
 	return uc.repo.Update(ctx, id, p)
+}
+
+func (uc *ProductUsecase) DeleteById(ctx context.Context, id string) (string, error) {
+	return uc.repo.DeleteById(ctx, id)
 }

@@ -97,6 +97,30 @@ func (r *productRepo) FindByID(ctx context.Context, id string) (*biz.Product, er
 	return &product, nil
 }
 
+func (r *productRepo) DeleteById(ctx context.Context, id string) (string, error) {
+	product, err := r.FindByID(ctx, id)
+
+	if err != nil {
+		return "", err
+	}
+
+	if product == nil {
+		return "", ErrProductNotFound
+	}
+
+	q := `DELETE FROM products WHERE id = :id`
+
+	data := struct{ Id string }{Id: id}
+
+	_, err = r.data.db.NamedExecContext(ctx, q, data)
+	if err != nil {
+		return "", err
+	}
+
+	return id, nil
+
+}
+
 func (r *productRepo) ListByHello(context.Context, string) ([]*biz.Product, error) {
 	return nil, nil
 }

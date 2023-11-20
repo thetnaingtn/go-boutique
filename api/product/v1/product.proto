@@ -21,7 +21,11 @@ service Product {
 			body: "body"
 		};
 	};
-	rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductReply);
+	rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductReply){
+		option (google.api.http) = {
+			delete: "/products/{id}"
+		};
+	};
 	rpc GetProduct (GetProductRequest) returns (GetProductReply){
 		option (google.api.http) = {
 			get: "/products/{id}"
@@ -67,8 +71,12 @@ message UpdateProductReply {
 	int64 price = 4;
 }
 
-message DeleteProductRequest {}
-message DeleteProductReply {}
+message DeleteProductRequest {
+	string id = 1;
+}
+message DeleteProductReply {
+	string id = 1;
+}
 
 message GetProductRequest {
 	string id = 1;

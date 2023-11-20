@@ -20,12 +20,14 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationProductCreateProduct = "/api.product.v1.Product/CreateProduct"
+const OperationProductDeleteProduct = "/api.product.v1.Product/DeleteProduct"
 const OperationProductGetProduct = "/api.product.v1.Product/GetProduct"
 const OperationProductListProduct = "/api.product.v1.Product/ListProduct"
 const OperationProductUpdateProduct = "/api.product.v1.Product/UpdateProduct"
 
 type ProductHTTPServer interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductReply, error)
+	DeleteProduct(context.Context, *DeleteProductRequest) (*DeleteProductReply, error)
 	GetProduct(context.Context, *GetProductRequest) (*GetProductReply, error)
 	ListProduct(context.Context, *ListProductRequest) (*ListProductReply, error)
 	UpdateProduct(context.Context, *UpdateProductRequest) (*UpdateProductReply, error)
@@ -35,6 +37,7 @@ func RegisterProductHTTPServer(s *http.Server, srv ProductHTTPServer) {
 	r := s.Route("/")
 	r.POST("/products", _Product_CreateProduct0_HTTP_Handler(srv))
 	r.PUT("/products/{id}", _Product_UpdateProduct0_HTTP_Handler(srv))
+	r.DELETE("/products/{id}", _Product_DeleteProduct0_HTTP_Handler(srv))
 	r.GET("/products/{id}", _Product_GetProduct0_HTTP_Handler(srv))
 	r.GET("/products", _Product_ListProduct0_HTTP_Handler(srv))
 }
@@ -86,6 +89,28 @@ func _Product_UpdateProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.C
 	}
 }
 
+func _Product_DeleteProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteProductRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProductDeleteProduct)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteProduct(ctx, req.(*DeleteProductRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteProductReply)
+		return ctx.Result(200, reply)
+	}
+}
+
 func _Product_GetProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
 		var in GetProductRequest
@@ -129,6 +154,7 @@ func _Product_ListProduct0_HTTP_Handler(srv ProductHTTPServer) func(ctx http.Con
 
 type ProductHTTPClient interface {
 	CreateProduct(ctx context.Context, req *CreateProductRequest, opts ...http.CallOption) (rsp *CreateProductReply, err error)
+	DeleteProduct(ctx context.Context, req *DeleteProductRequest, opts ...http.CallOption) (rsp *DeleteProductReply, err error)
 	GetProduct(ctx context.Context, req *GetProductRequest, opts ...http.CallOption) (rsp *GetProductReply, err error)
 	ListProduct(ctx context.Context, req *ListProductRequest, opts ...http.CallOption) (rsp *ListProductReply, err error)
 	UpdateProduct(ctx context.Context, req *UpdateProductRequest, opts ...http.CallOption) (rsp *UpdateProductReply, err error)
@@ -149,6 +175,19 @@ func (c *ProductHTTPClientImpl) CreateProduct(ctx context.Context, in *CreatePro
 	opts = append(opts, http.Operation(OperationProductCreateProduct))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in.Body, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *ProductHTTPClientImpl) DeleteProduct(ctx context.Context, in *DeleteProductRequest, opts ...http.CallOption) (*DeleteProductReply, error) {
+	var out DeleteProductReply
+	pattern := "/products/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProductDeleteProduct))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
